@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<head>
+    <!-- VueJS-->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.0"></script>
+    <!-- Bootstrap if we will use VueJS bootstrap components -->
+    <script src="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.js"></script>
+    <!-- Bootstrap CSS -->
+    <link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap/dist/css/bootstrap.min.css"/>
+    <!-- AXIOS -->
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <title>{{ title }}</title>
+</head>
+<body>
+    <div id='app'>
+        <div class="container">
+            <table class="table table-bordered table-hover table-responseive-sm">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Key</th>
+                        <th>Value</th>
+                        <th>Is Primary</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="elm, id in results">
+                        <td v-bind:class="[{'table-primary': elm.isPrimary}]">[[ id ]]</td>
+                        <td v-bind:class="[{'table-warning': elm.isPrimary}]">[[ elm.key ]]</td>
+                        <td v-bind:class="[{'table-danger': elm.isPrimary}]">[[ elm.value ]]</td>
+                        <td>
+                            <button type="button" class="btn btn-info btn-sm" v-on:click="update_isPrimary(id)">Update</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% block scripts %}
+        <script>
+            vue = new Vue({
+                delimiters: ['[[', ']]'],
+                el: '#app',
+                data: {
+                    results: null
+                },
+                mounted(){
+                    this.fetch_random_data()
+                },
+                methods: {
+                    fetch_random_data: function(){
+                        axios.get('{{ url_for("random") }}').then(
+                            response => (
+                                this.results = response.data.data
+                            )
+                        ).catch(function(error){
+                            console.log(error)
+                        })
+                    },
+                    update_isPrimary(id){
+                        this.results[id]['isPrimary'] = !this.results[id]['isPrimary']
+                    }
+                }
+            })
+        </script>
+    {% endblock %}
+</body>
+</html>
